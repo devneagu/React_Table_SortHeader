@@ -8,6 +8,8 @@ const TableHeader = styled.th`
   padding: 0.5em 0.8em;
   text-transform: uppercase;
   cursor: pointer;
+  font-size: 0.8em;
+  position: relative;
 `;
 const TableRow = styled.tr`
   font-size: 0.8em;
@@ -33,6 +35,15 @@ const InputElement = styled.input`
   padding: 0.5em;
   color: black;
   margin: 1em;
+`;
+
+const SVGIconButton = styled.svg`
+  width: 1em;
+  position: absolute;
+  right: -0.2em;
+  top: 0.5em;
+  height: 1em;
+  fill: black;
 `;
 
 // https://randomuser.me/api/?results=20
@@ -91,24 +102,46 @@ function getObjectKeys(data: any) {
   return listKeys;
 }
 
-function sortColumnRule(ruleColumn) {
+function sortColumnRule(column, ruleColumn) {
   switch (ruleColumn.direction) {
     case "ASCENDING":
       return {
-        column: ruleColumn.column,
+        column: column,
         direction: "DESCENDING"
       };
     case "DESCENDING":
       return {
-        column: ruleColumn.column,
+        column: column,
         direction: "ASCENDING"
       };
     default:
       return {
-        column: ruleColumn.column,
+        column: column,
         direction: "DESCENDING"
       };
   }
+}
+
+function SvgIconSortAscending() {
+  return (
+    <SVGIconButton xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+      <path
+        fill-rule="evenodd"
+        d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"
+      />
+    </SVGIconButton>
+  );
+}
+
+function SvgIconSortDescending() {
+  return (
+    <SVGIconButton xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+      <path
+        fill-rule="evenodd"
+        d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"
+      />
+    </SVGIconButton>
+  );
 }
 
 export default function App() {
@@ -159,7 +192,7 @@ export default function App() {
       setSortingDirections(newRule);
       newData.data = newData.data.sort(compareMiddleware(newRule));
     } else {
-      const newRule = sortColumnRule(sortingDirections);
+      const newRule = sortColumnRule(column, sortingDirections);
       setSortingDirections(newRule);
       newData.data = newData.data.sort(compareMiddleware(newRule));
     }
@@ -181,6 +214,18 @@ export default function App() {
                     onClick={() => sortColumn(headerItem)}
                   >
                     {headerItem}
+                    {sortingDirections && sortingDirections.column && (
+                      <span>
+                        {sortingDirections.column === headerItem &&
+                          sortingDirections.direction === "ASCENDING" && (
+                            <SvgIconSortAscending />
+                          )}
+                        {sortingDirections.column === headerItem &&
+                          sortingDirections.direction === "DESCENDING" && (
+                            <SvgIconSortDescending />
+                          )}
+                      </span>
+                    )}
                   </TableHeader>
                 ))}
             </tr>
